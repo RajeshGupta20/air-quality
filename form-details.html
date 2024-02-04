@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Submitted Form Details</title>
+</head>
+<body>
+    <h1>Submitted Form Details</h1>
+    <table border="1">
+        <tr>
+            <th>Field</th>
+     <th>Value</th>
+        </tr>
+        <tr>
+            <td>Name</td>
+            <td id="name"></td>
+        </tr>
+        <!-- Add rows for other form fields -->
+    </table>
+
+    <script>
+        // Parse the query string to get form data
+        const queryString = window.location.search;
+        const urlParams = new URLSearchParams(queryString);
+
+        // Display form data in the table
+        document.getElementById('name').textContent = urlParams.get('name');
+        // Display other form field values similarly
+    </script>
+</body>
+</html>

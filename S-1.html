@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Real-time Sensor Data Collection</title>
+   
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-image: url('./back.avif'); /* Specify your background image URL */
+            background-size: cover; /* Cover the entire screen */
+            background-color: #f9f9f9;
+            background-position: center; /* Center the background image */
+            font-family: Arial, sans-serif; /* Specify your preferred font family */
+        }
+    
+        .container {
+            max-width: 800px;
+            overflow-y: auto; /* Enable vertical scrolling */
+            height: 400px; /* Set a fixed height */
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        .header h1 {
+            font-size: 36px;
+            color: #333; /* Set your desired text color */
+            background-image: url('./ic.jpeg'); /* Set your icon image URL */
+            background-size: 40px; /* Set the size of your icon */
+            background-repeat: no-repeat;
+            background-position: center left;
+            padding-left: 60px; /* Adjust padding to ensure space for the icon */
+            margin: 0;
+            padding-top: 10px;
+        }
+        .sensor {
+            display: flex;
+            align-items: center;
+            border-bottom: 1px solid #ccc;
+            padding-bottom: 10px;
+            margin-bottom: 10px;
+        }
+        .sensor img {
+            width: 50px;
+            height: 50px;
+            margin-right: 10px;
+        }
+        .data {
+            flex: 1;
+        }
+        .value {
+            font-weight: bold;
+            margin-left: 10px;
+        }
+        .refresh-container {
+            display: flex;
+            justify-content: center;
+            margin-top: 20px;
+        }
+        .refresh {
+            padding: 10px 20px;
+            font-size: 16px;
+            border: none;
+            border-radius: 5px;
+            background-color: #4CAF50;
+            color: white;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        .refresh:hover {
+            background-color: #45a049;
+        }
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f9f9f9;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        h1, h2 {
+            text-align: center;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        label {
+            font-weight: bold;
+        }
+        textarea {
+            width: 100%;
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            box-sizing: border-box;
+        }
+        input[type="submit"] {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            padding: 10px 20px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        input[type="submit"]:hover {
+            background-color: #45a049;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Real-time Sensor Data Collection</h1>
+        <div class="sensor">
+            <img src="./1.png" alt="Temperature">
+            <div class="data" id="temperature">Temperature: </div>
+        </div>
+        <div class="sensor">
+            <img src="./2.png" alt="Humidity">
+            <div class="data" id="humidity">Humidity: </div>
+        </div>
+        <div class="sensor">
+            <img src="./3.png" alt="Pressure">
+            <div class="data" id="pressure">Pressure: </div>
+        </div>
+        <div class="sensor">
+            <img src="./4.jpeg" alt="MQ2">
+            <div class="data" id="mq2">MQ2: </div>
+        </div>
+        <div class="sensor">
+            <img src="./4.jpeg" alt="MQ135">
+            <div class="data" id="mq135">MQ135: </div>
+        </div>
+        <div class="sensor">
+            <img src="./5.png" alt="Air Quality">
+            <div class="data" id="airQuality">Air Quality: </div>
+        </div>
+        <div class="refresh-container">
+            <button class="refresh" onclick="refreshPage()">Refresh</button>
+            <a href="http://127.0.0.1:5500/somu/S-1.html"></a>
+        </div>
+    </div>
+    <div class="container">
+        <h1>Community Engagement Form</h1>
+        <form action="#" method="post">
+            <div class="form-group">
+                <label for="name">Your Name:</label>
+                <input type="text" id="name" name="name" required>
+            </div>
+            <div class="form-group">
+                <label for="email">Your Email:</label>
+                <input type="text" id="email" name="email" required>
+            </div>
+            <div class="form-group">
+                <label for="query">Query:</label>
+                <textarea id="query" name="query" required></textarea>
+            </div>
+            <div class="form-group">
+                <label for="idea">Idea:</label>
+                <textarea id="idea" name="idea" required></textarea>
+            </div>
+            <div class="form-group">
+                <label for="problem">Problem:</label>
+                <textarea id="problem" name="problem" required></textarea>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Submit">
+            </div>
+        </form>
+    </div>
+    <script>
+        const apiKey = 'LIJ7PRB9UNAIXHGQ';
+        const channelId = '2239189';
+        const apiUrl = `https://api.thingspeak.com/channels/${channelId}/feeds.json?api_key=${apiKey}&results=1`;
+
+        async function fetchData() {
+            try {
+                const response = await fetch(apiUrl);
+                const data = await response.json();
+
+                if (data.feeds && data.feeds.length > 0) {
+                    const latestEntry = data.feeds[0];
+                    document.getElementById('temperature').innerHTML = `Temperature: ${latestEntry.field1}`;
+                    document.getElementById('humidity').innerHTML = `Humidity: ${latestEntry.field2}`;
+                    document.getElementById('pressure').innerHTML = `Pressure: ${latestEntry.field3}`;
+                    document.getElementById('mq2').innerHTML = `MQ2: ${latestEntry.field4}`;
+                    document.getElementById('mq135').innerHTML = `MQ135: ${latestEntry.field5}`;
+                    document.getElementById('airQuality').innerHTML = `Air Quality: ${latestEntry.field6}`;
+                }
+            } catch (error) {
+                console.error('Error fetching data:', error);
+            }
+        }
+
+        // Fetch data initially and then every 5 seconds
+        fetchData();
+        setInterval(fetchData, 5000);
+    </script>
+   
+   
+
+    <script>
+        function refreshPage() {
+            // Reloads the current page
+            location.reload();
+        }
+    </script>
+
+
+    
+</body>
+</html>
